@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debt Snowball Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .results-section {
+            background: #fff;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+
+        label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input[type="text"], input[type="number"], input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus, input[type="email"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #56c568, #4caf50);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .debt-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .debt-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .debt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .debt-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .debt-balance {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #ff6b6b;
+        }
+
+        .debt-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .summary-card p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .payment-schedule {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+        }
+
+        .schedule-month {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .schedule-month:last-child {
+            border-bottom: none;
+        }
+
+        .schedule-month:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .footer {
+            background: #343a40;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #c3e6cb;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💸 Debt Snowball Calculator</h1>
+            <p>Take control of your finances with the debt snowball method</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">📊 Enter Your Debts</h2>
+                
+                <div id="message-area"></div>
+                
+                <div class="form-group">
+                    <label>Extra Monthly Payment Available</label>
+                    <input type="number" id="extraPayment" placeholder="$0" min="0" step="0.01">
+                </div>
+
+                <div id="debts-container">
+                    <div class="form-row">
+                        <div>
+                            <label>Debt Name</label>
+                            <input type="text" class="debt-name-input" placeholder="Credit Card">
+                        </div>
+                        <div>
+                            <label>Balance</label>
+                            <input type="number" class="debt-balance-input" placeholder="5000" min="0" step="0.01">
+                        </div>
+                        <div>
+                            <label>Interest Rate (%)</label>
+                            <input type="number" class="debt-rate-input" placeholder="18.5" min="0" max="100" step="0.01">
+                        </div>
+                        <div>
+                            <label>Min Payment</label>
+                            <input type="number" class="debt-payment-input" placeholder="100" min="0" step="0.01">
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-danger" onclick="removeDebt(this)">❌</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button type="button" class="btn btn-primary" onclick="addDebt()">➕ Add Debt</button>
+                    <button type="button" class="btn btn-success" onclick="calculate()">🧮 Calculate</button>
+                    <button type="button" class="btn btn-secondary" onclick="saveData()">💾 Save Data</button>
+                    <button type="button" class="btn btn-secondary" onclick="loadData()">📂 Load Data</button>
+                </div>
+
+                <div class="form-group" style="margin-top: 30px;">
+                    <label>Email Address (for sending results)</label>
+                    <input type="email" id="userEmail" placeholder="your.email@example.com">
+                    <button type="button" class="btn btn-primary" onclick="emailResults()" style="margin-top: 10px;">📧 Email Results</button>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h2 class="section-title">📈 Your Debt Payoff Plan</h2>
+                <div id="results-container">
+                    <p style="text-align: center; color: #666; padding: 40px;">
+                        Enter your debts and click "Calculate" to see your personalized debt snowball plan!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Use Money Well. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    </footer>
+
+    <script>
+        let debts = [];
+        let payoffSchedule = [];
+
+        function addDebt() {
+            const container = document.getElementById('debts-container');
+            const debtRow = document.createElement('div');
+            debtRow.className = 'form-row';
+            debtRow.innerHTML = `
+                <div>
+                    <label>Debt Name</label>
+                    <input type="text" class="debt-name-input" placeholder="Credit Card">
+                </div>
+                <div>
+                    <label>Balance</label>
+                    <input type="number" class="debt-balance-input" placeholder="5000" min="0" step="0.01">
+                </div>
+                <div>
+                    <label>Interest Rate (%)</label>
+                    <input type="number" class="debt-rate-input" placeholder="18.5" min="0" max="100" step="0.01">
+                </div>
+                <div>
+                    <label>Min Payment</label>
+                    <input type="number" class="debt-payment-input" placeholder="100" min="0" step="0.01">
+                </div>
+                <div>
+                    <button type="button" class="btn btn-danger" onclick="removeDebt(this)">❌</button>
+                </div>
+            `;
+            container.appendChild(debtRow);
+        }
+
+        function removeDebt(button) {
+            const debtRows = document.querySelectorAll('.form-row');
+            if (debtRows.length > 1) {
+                button.closest('.form-row').remove();
+            } else {
+                showMessage('You must have at least one debt entry.', 'error');
+            }
+        }
+
+        function collectDebts() {
+            debts = [];
+            const debtRows = document.querySelectorAll('.form-row');
+            
+            debtRows.forEach(row => {
+                const name = row.querySelector('.debt-name-input').value.trim();
+                const balance = parseFloat(row.querySelector('.debt-balance-input').value) || 0;
+                const rate = parseFloat(row.querySelector('.debt-rate-input').value) || 0;
+                const minPayment = parseFloat(row.querySelector('.debt-payment-input').value) || 0;
+                
+                if (name && balance > 0) {
+                    debts.push({
+                        name: name,
+                        balance: balance,
+                        rate: rate / 100,
+                        minPayment: minPayment,
+                        originalBalance: balance
+                    });
+                }
+            });
+            
+            return debts.length > 0;
+        }
+
+        function calculate() {
+            if (!collectDebts()) {
+                showMessage('Please enter at least one valid debt with a name and balance.', 'error');
+                return;
+            }
+
+            const extraPayment = parseFloat(document.getElementById('extraPayment').value) || 0;
+            
+            // Sort debts by balance (smallest first) for snowball method
+            debts.sort((a, b) => a.balance - b.balance);
+            
+            // Calculate payoff schedule
+            payoffSchedule = calculateSnowball(debts, extraPayment);
+            displayResults();
+            showMessage('Calculation completed successfully!', 'success');
+        }
+
+        function calculateSnowball(debtList, extraPayment) {
+            const schedule = [];
+            let month = 0;
+            let totalPaid = 0;
+            let workingDebts = JSON.parse(JSON.stringify(debtList));
+            
+            while (workingDebts.some(debt => debt.balance > 0)) {
+                month++;
+                let monthlyPayments = [];
+                let availableExtra = extraPayment;
+                
+                // Calculate minimum payments and interest
+                workingDebts.forEach(debt => {
+                    if (debt.balance > 0) {
+                        const monthlyRate = debt.rate / 12;
+                        const interestCharge = debt.balance * monthlyRate;
+                        const principalPayment = debt.minPayment - interestCharge;
+                        
+                        debt.balance = Math.max(0, debt.balance - principalPayment);
+                        totalPaid += debt.minPayment;
+                        
+                        monthlyPayments.push({
+                            name: debt.name,
+                            payment: debt.minPayment,
+                            balance: debt.balance,
+                            interest: interestCharge
+                        });
+                    }
+                });
+                
+                // Apply extra payment to smallest debt
+                const smallestDebt = workingDebts.find(debt => debt.balance > 0);
+                if (smallestDebt && availableExtra > 0) {
+                    const extraApplied = Math.min(availableExtra, smallestDebt.balance);
+                    smallestDebt.balance -= extraApplied;
+                    totalPaid += extraApplied;
+                    
+                    // Update the payment record
+                    const paymentRecord = monthlyPayments.find(p => p.name === smallestDebt.name);
+                    if (paymentRecord) {
+                        paymentRecord.payment += extraApplied;
+                        paymentRecord.balance = smallestDebt.balance;
+                    }
+                }
+                
+                // When a debt is paid off, add its minimum payment to extra payment pool
+                workingDebts.forEach(debt => {
+                    if (debt.balance <= 0 && debt.minPayment > 0) {
+                        extraPayment += debt.minPayment;
+                        debt.minPayment = 0; // Prevent double counting
+                    }
+                });
+                
+                schedule.push({
+                    month: month,
+                    payments: monthlyPayments,
+                    totalPaid: totalPaid,
+                    remainingDebts: workingDebts.filter(debt => debt.balance > 0).length
+                });
+                
+                if (month > 600) break; // Safety net
+            }
+            
+            return schedule;
+        }
+
+        function displayResults() {
+            const container = document.getElementById('results-container');
+            const totalBalance = debts.reduce((sum, debt) => sum + debt.originalBalance, 0);
+            const totalMinPayments = debts.reduce((sum, debt) => sum + debt.minPayment, 0);
+            const extraPayment = parseFloat(document.getElementById('extraPayment').value) || 0;
+            
+            const payoffTime = payoffSchedule.length;
+            const totalPaid = payoffSchedule[payoffSchedule.length - 1]?.totalPaid || 0;
+            const totalInterest = totalPaid - totalBalance;
+            
+            container.innerHTML = `
+                <div class="summary-card">
+                    <h3>Debt-Free in ${payoffTime} months!</h3>
+                    <p>You'll save $${totalInterest.toFixed(2)} in interest</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center;">
+                        <h4 style="color: #333;">Total Debt</h4>
+                        <p style="font-size: 1.3em; font-weight: 600; color: #ff6b6b;">$${totalBalance.toFixed(2)}</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center;">
+                        <h4 style="color: #333;">Monthly Payment</h4>
+                        <p style="font-size: 1.3em; font-weight: 600; color: #28a745;">$${(totalMinPayments + extraPayment).toFixed(2)}</p>
+                    </div>
+                </div>
+                
+                <h3 style="margin-bottom: 15px;">📋 Payment Schedule</h3>
+                <div class="payment-schedule">
+                    ${payoffSchedule.slice(0, 12).map(month => `
+                        <div class="schedule-month">
+                            <strong>Month ${month.month}</strong>
+                            <div>
+                                ${month.payments.map(p => `
+                                    <div style="margin-bottom: 5px;">
+                                        ${p.name}: $${p.payment.toFixed(2)} 
+                                        ${p.balance > 0 ? `(Remaining: $${p.balance.toFixed(2)})` : '<span style="color: #28a745; font-weight: 600;">PAID OFF! 🎉</span>'}
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div style="text-align: right;">
+                                <small style="color: #666;">${month.remainingDebts} debts left</small>
+                            </div>
+                        </div>
+                    `).join('')}
+                    ${payoffSchedule.length > 12 ? `
+                        <div style="padding: 15px; text-align: center; color: #666;">
+                            ... and ${payoffSchedule.length - 12} more months to complete payoff
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function saveData() {
+            const data = {
+                debts: Array.from(document.querySelectorAll('.form-row')).map(row => ({
+                    name: row.querySelector('.debt-name-input').value,
+                    balance: row.querySelector('.debt-balance-input').value,
+                    rate: row.querySelector('.debt-rate-input').value,
+                    minPayment: row.querySelector('.debt-payment-input').value
+                })),
+                extraPayment: document.getElementById('extraPayment').value,
+                email: document.getElementById('userEmail').value
+            };
+            
+            const dataStr = JSON.stringify(data);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'debt-snowball-data.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            
+            showMessage('Data saved successfully!', 'success');
+        }
+
+        function loadData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            
+                            // Clear existing debts
+                            document.getElementById('debts-container').innerHTML = '';
+                            
+                            // Load debts
+                            data.debts.forEach((debt, index) => {
+                                if (index > 0) addDebt();
+                                const rows = document.querySelectorAll('.form-row');
+                                const currentRow = rows[index];
+                                currentRow.querySelector('.debt-name-input').value = debt.name || '';
+                                currentRow.querySelector('.debt-balance-input').value = debt.balance || '';
+                                currentRow.querySelector('.debt-rate-input').value = debt.rate || '';
+                                currentRow.querySelector('.debt-payment-input').value = debt.minPayment || '';
+                            });
+                            
+                            document.getElementById('extraPayment').value = data.extraPayment || '';
+                            document.getElementById('userEmail').value = data.email || '';
+                            
+                            showMessage('Data loaded successfully!', 'success');
+                        } catch (error) {
+                            showMessage('Error loading file. Please ensure it\'s a valid JSON file.', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+
+        function emailResults() {
+            const email = document.getElementById('userEmail').value.trim();
+            if (!email) {
+                showMessage('Please enter your email address.', 'error');
+                return;
+            }
+            
+            if (!debts.length || !payoffSchedule.length) {
+                showMessage('Please calculate your debt payoff plan first.', 'error');
+                return;
+            }
+            
+            const totalBalance = debts.reduce((sum, debt) => sum + debt.originalBalance, 0);
+            const payoffTime = payoffSchedule.length;
+            const totalPaid = payoffSchedule[payoffSchedule.length - 1]?.totalPaid || 0;
+            const totalInterest = totalPaid - totalBalance;
+            
+            const subject = encodeURIComponent('Your Debt Snowball Payment Plan');
+            const body = encodeURIComponent(`
+Hi there!
+
+Here's your personalized debt snowball payment plan:
+
+SUMMARY:
+• Total Debt: $${totalBalance.toFixed(2)}
+• Payoff Time: ${payoffTime} months
+• Total Interest Saved: $${totalInterest.toFixed(2)}
+
+DEBT DETAILS:
+${debts.map(debt => `• ${debt.name}: $${debt.originalBalance.toFixed(2)} at ${(debt.rate * 100).toFixed(2)}% APR`).join('\n')}
+
+Your debt-free date is approximately ${payoffTime} months from now!
+
+Keep up the great work on your financial journey!
+
+Generated by Use Money Well Debt Snowball Calculator
+            `);
+            
+            const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`;
+            window.location.href = mailtoLink;
+            
+            showMessage('Email client opened! Please send the email from your email application.', 'success');
+        }
+
+        function showMessage(message, type) {
+            const messageArea = document.getElementById('message-area');
+            const messageClass = type === 'error' ? 'error-message' : 'success-message';
+            messageArea.innerHTML = `<div class="${messageClass}">${message}</div>`;
+            setTimeout(() => {
+                messageArea.innerHTML = '';
+            }, 5000);
+        }
+
+        // Auto-save inputs
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('input')) {
+                // Auto-calculate when values change
+                const timer = setTimeout(() => {
+                    if (collectDebts()) {
+                        calculate();
+                    }
+                }, 1000);
+                
+                // Clear previous timer
+                if (window.autoCalcTimer) {
+                    clearTimeout(window.autoCalcTimer);
+                }
+                window.autoCalcTimer = timer;
+            }
+        });
+
+        // Initialize with sample data for demo
+        window.addEventListener('load', function() {
+            document.querySelector('.debt-name-input').value = 'Credit Card A';
+            document.querySelector('.debt-balance-input').value = '5000';
+            document.querySelector('.debt-rate-input').value = '18.5';
+            document.querySelector('.debt-payment-input').value = '150';
+            document.getElementById('extraPayment').value = '200';
+        });
+    </script>
+</body>
+</html>
